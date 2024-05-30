@@ -1,7 +1,8 @@
 import pygame
 import random
+from enemy import Enemy
 
-class Goblin:
+class Goblin(Enemy):
     def __init__(self, position, window):
         # Load the goblin image from the specified path
         self.image = pygame.image.load("AT2/assets/goblin.png").convert_alpha()  # Ensure the image path is correct
