@@ -2,6 +2,7 @@ import pygame
 from assets import GAME_ASSETS
 
 class CharacterSelect:
+
     """
     A class representing the character selection screen.
 
@@ -27,16 +28,34 @@ class CharacterSelect:
             window (pygame.Surface): The game window surface.
         """
         self.window = window
-        self.font = pygame.font.Font(None, 36)  # Use a default font
-        self.background_image = pygame.image.load(GAME_ASSETS['main_menu_background']).convert()
+        self.font = pygame.font.Font(None, 36)  
+        self.background_image = self.load_image(GAME_ASSETS['main_menu_background'])
         self.background_image = pygame.transform.scale(self.background_image, (self.window.get_width(), self.window.get_height()))
+        
         self.characters = {
-            "Warrior": pygame.image.load(GAME_ASSETS['warrior_button']).convert_alpha(),
-            "Mage": pygame.image.load(GAME_ASSETS['mage_button']).convert_alpha(),
-            "Rogue": pygame.image.load(GAME_ASSETS['rogue_button']).convert_alpha()
+            "Warrior": self.load_image(GAME_ASSETS['warrior_button']),
+            "Mage": self.load_image(GAME_ASSETS['mage_button']),
+            "Rogue": self.load_image(GAME_ASSETS['rogue_button'])
         }
         self.character_buttons = self.setup_character_buttons()
         self.back_button = pygame.Rect(50, self.window.get_height() - 50 - 30, 100, 30)  # Positioned at bottom left
+
+    def load_image(self, path):
+        """
+        Load an image from the specified path.
+
+        Args:
+            path (str): The path to the image file.
+
+        Returns:
+            pygame.Surface: The loaded image.
+        """
+        try:
+            image = pygame.image.load(path).convert_alpha()
+            return image
+        except pygame.error as e:
+            print(f"Error loading image at {path}: {e}")
+            return None
 
     def setup_character_buttons(self):
         """
@@ -56,39 +75,60 @@ class CharacterSelect:
         y = self.window.get_height() // 3 - max_height // 2  # position them a bit higher to make space for back button
 
         for character, image in self.characters.items():
-            aspect_ratio = image.get_height() / image.get_width()
-            button_height = int(button_width * aspect_ratio)
-            button_height = min(button_height, max_height)  # Ensure button isn't too tall
-            scaled_image = pygame.transform.scale(image, (button_width, button_height))
-            buttons[character] = (scaled_image, pygame.Rect(x, y, button_width, button_height))
-            x += button_width + total_spacing
+            if image:  # Ensure the image is valid
+                aspect_ratio = image.get_height() / image.get_width()
+                button_height = int(button_width * aspect_ratio)
+                button_height = min(button_height, max_height)  # Ensure button isn't too tall
+                scaled_image = pygame.transform.scale(image, (button_width, button_height))
+                buttons[character] = (scaled_image, pygame.Rect(x, y, button_width, button_height))
+                x += button_width + total_spacing
 
         return buttons
 
+    def draw(self):
+        """
+        Draws the character selection screen elements.
+        """
+        self.window.blit(self.background_image, (0, 0))
+        for character, (image, rect) in self.character_buttons.items():
+            self.window.blit(image, rect)
+
+        # Draw back button
+        pygame.draw.rect(self.window, (200, 200, 200), self.back_button)  # Draw a grey button
+        back_text = self.font.render('Back', True, (0, 0, 0))
+        text_rect = back_text.get_rect(center=self.back_button.center)
+        self.window.blit(back_text, text_rect)
+
+    def handle_events(self):
+        """
+        Handles events in the character selection screen.
+
+        Returns:
+            str: The name of the selected character or 'back' if back button is clicked.
+        """
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                return None
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if self.back_button.collidepoint(event.pos):
+                    return 'back'
+                for character, (image, rect) in self.character_buttons.items():
+                    if rect.collidepoint(event.pos):
+                        return character
+        return None
+
     def run(self):
+        """
+        Runs the character selection screen loop.
+        """
         running = True
         while running:
-            self.window.blit(self.background_image, (0, 0))
-            for character, (image, rect) in self.character_buttons.items():
-                self.window.blit(image, rect)
-
-            # Draw back button
-            pygame.draw.rect(self.window, (200, 200, 200), self.back_button)  # Draw a grey button
-            back_text = self.font.render('Back', True, (0, 0, 0))
-            text_rect = back_text.get_rect(center=self.back_button.center)
-            self.window.blit(back_text, text_rect)
-
+            self.draw()
             pygame.display.flip()
 
-            for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                    pygame.quit()
-                    return None
-                elif event.type == pygame.MOUSEBUTTONDOWN:
-                    if self.back_button.collidepoint(event.pos):
-                        return 'back'
-                    for character, (image, rect) in self.character_buttons.items():
-                        if rect.collidepoint(event.pos):
-                            return character
+            result = self.handle_events()
+            if result is not None:
+                return result
 
         return None

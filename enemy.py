@@ -1,7 +1,8 @@
 import pygame
 import random
+from healthbar import Healthbar
 
-class Enemy:
+class Enemy():
     def __init__(self, image_path, position, window):
         # Load the enemy image from the specified image path
         self.image = pygame.image.load(image_path).convert_alpha()
@@ -34,3 +35,7 @@ class Enemy:
         
         # Draw the enemy image on the window at the adjusted position
         self.window.blit(self.image, adjusted_position)
+
+
+
+
