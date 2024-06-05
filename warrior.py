@@ -1,14 +1,13 @@
+
 from character import Character
 
 class Warrior(Character):
     def __init__(self, name, max_hp):
-        super().__init__(name, "Warrior", armor=10)
+        super().__init__(name, "Warrior", armor=10, max_hp=max_hp)
         self.max_stamina = 100
         self.current_stamina = self.max_stamina
         self.stamina_regeneration = 10
         self.strength = 15
-        self.max_hp = max_hp
-        self.current_hp = max_hp
         self.attacks = {
             "Basic Attack": {"method": self.basic_attack, "stamina_cost": 10},
             "Charge": {"method": self.charge, "stamina_cost": 20},
@@ -37,39 +36,35 @@ class Warrior(Character):
     def regenerate_stamina(self):
         self.current_stamina = min(self.max_stamina, self.current_stamina + self.stamina_regeneration)
 
-
-
-
     def attack(self, target):
-        # Calculate damage based on warrior's level, strength, and any weapon modifiers
-        # For simplicity, let's assume the warrior's damage is directly proportional to their level
-        damage = self.strength*self.level
-        target.take_damage(damage)  # Apply damage to the target
-        return damage  # Return the amount of damage dealt
+        damage = self.strength * self.level
+        target.take_damage(damage)
+        return damage
 
     def charge(self, target):
         print(f"{self.name} charges towards {target.name}!")
-        target.take_damage(self.strength)  # Example: Charge deals damage equal to the warrior's strength
+        target.take_damage(self.strength)
 
     def basic_attack(self, target):
-        damage = self.strength  # Example: Basic attack damage equals warrior's strength
+        damage = self.strength
         print(f"{self.name} performs a basic attack on {target} for {damage} damage!")
         target.take_damage(damage)
 
     def cleave_attack(self, targets):
         total_damage = 0
         for target in targets:
-            damage = self.strength * 2  # Example: Cleave attack deals double the warrior's strength to each target
+            damage = self.strength * 2
             total_damage += damage
             print(f"{self.name} cleaves {target} for {damage} damage!")
             target.take_damage(damage)
         print(f"{self.name} dealt a total of {total_damage} damage with cleave!")
 
     def shield_bash(self, target):
-        damage = self.strength + 5  # Example: Shield bash deals warrior's strength plus 5 additional damage
+        damage = self.strength + 5
         print(f"{self.name} performs a shield bash on {target} for {damage} damage!")
         target.take_damage(damage)
 
     def defensive_stance(self):
-        self.armor_class += 5  # Example: Defensive stance increases armor class by 5
+        self.armor_class += 5
         print(f"{self.name} enters a defensive stance, increasing armor class!")
+

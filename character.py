@@ -2,18 +2,20 @@ class Character:
     MAX_LEVEL = 50  # Maximum level a character can reach
     ATTRIBUTE_POINTS_PER_LEVEL = 3  # Number of attribute points gained per level
 
-    def __init__(self, name, character_class, armor):
+    def __init__(self, name, character_class, armor, max_hp):
         self.name = name  # Character's name
         self.character_class = character_class  # Character's class
         self.armor = armor  # Character's armor value
         self.level = 1  # Character's current level
         self.experience_points = 0  # Character's current experience points
-        self.hit_points = 10  # Example starting value for character's hit points
+        self.hit_points = max_hp  # Example starting value for character's hit points
+        self.max_hp = max_hp
         self.armor_class = 10  # Example starting value for character's armor class
         self.skills = {}  # Example empty dictionary for character's skills
         self.inventory = []  # Example empty list for character's inventory
         self.gold = 0  # Example starting value for character's gold
         self.attribute_points = 0  # Attribute points available to allocate
+        self.position = [0, 0]
 
     def assign_attribute_points(self, attribute, points):
         # Ensure the attribute exists before assigning points
@@ -52,3 +54,36 @@ class Character:
             print(f"{self.name} takes {actual_damage} damage and has been defeated!")
         else:
             print(f"{self.name} takes {actual_damage} damage. Remaining hit points: {self.hit_points}")
+
+    def move(self, direction, speed):
+        if direction == 'left':
+            self.position[0] -= speed
+        elif direction == 'right':
+            self.position[0] += speed
+        elif direction == 'up':
+            self.position[1] -= speed
+        elif direction == 'down':
+            self.position[1] += speed
+
+    def check_for_combat(self, enemies):
+        for enemy in enemies:
+            if pygame.math.Vector2(enemy.position).distance_to(self.position) < 50:
+                return enemy
+        return None
+
+    def handle_combat(self, enemy):
+        if enemy:
+            player_damage = random.randint(5, 10)
+            enemy_defeated = enemy.take_damage(player_damage)
+            print(f"Player attacks! Deals {player_damage} damage to the enemy.")
+            if enemy_defeated:
+                print("Enemy defeated!")
+                return True
+            else:
+                enemy_damage = random.randint(5, 10)
+                print(f"Enemy attacks back! Deals {enemy_damage} damage to the player.")
+                self.take_damage(enemy_damage)
+                return False
+        return False
+
+
