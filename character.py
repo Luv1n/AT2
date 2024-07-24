@@ -3,6 +3,7 @@ import pygame
 class Character:
     MAX_LEVEL = 50  # Maximum level a character can reach
     ATTRIBUTE_POINTS_PER_LEVEL = 3  # Number of attribute points gained per level
+    MAX_STAMINA = 100
     def __init__(self, name, character_class, armor):
         self.name = name  # Character's name
         self.character_class = character_class  # Character's class
@@ -17,7 +18,13 @@ class Character:
         self.gold = 0  # Example starting value for character's gold
         self.attribute_points = 0  # Attribute points available to allocate
         self.font = pygame.font.SysFont('Arial', 24)
+        self.stamina = 0
+    
+    
        
+    def heal(self, health):
+
+        self.hit_points += health
 
     def assign_attribute_points(self, attribute, points):
         # Ensure the attribute exists before assigning points
@@ -42,8 +49,9 @@ class Character:
             required_experience = self.calculate_required_experience(self.level + 1)
 
     def calculate_required_experience(self, level):
-        # Example exponential scaling: Each level requires 100 more experience points than the previous level
-        return int(100 * (1.001 ** (level - 1)))
+        # Exponential scaling of experience required
+        return int(100 * (1.2 ** (level - 1)))
+
 
     def is_alive(self):
         return self.hit_points > 0
@@ -61,7 +69,7 @@ class Character:
         health_bar_width = 100  # Example width of the health bar
         health_bar_height = 5  # Example height of the health bar
         health_bar_x = position[0] - (health_bar_width // 2)
-        health_bar_y = position[1] - health_bar_height - 5  # 5 pixels above the player image
+        health_bar_y = position[1] - health_bar_height - 10  # 5 pixels above the player image
 
         health_ratio = self.hit_points / self.max_hit_points
         current_health_bar_width = int(health_bar_width * health_ratio)
@@ -91,9 +99,9 @@ class Character:
         pygame.draw.rect(window, (0, 0, 0), (xp_bar_x, xp_bar_y, xp_bar_width, xp_bar_height))  # Black background
         pygame.draw.rect(window, (0, 0, 255), (xp_bar_x, xp_bar_y, current_xp_bar_width, xp_bar_height))  # Blue foreground
 
-        # Render the level text
-        level_text = self.font.render(f"Level: {self.level}", True, (255, 255, 255))
-        level_text_rect = level_text.get_rect()
-        level_text_rect.midbottom = (xp_bar_x + xp_bar_width // 2, xp_bar_y - 40)  # Position 60 pixels above the XP bar
+        # Render the XP needed for the next level
+        xp_needed_text = self.font.render(f"XP Needed: {current_xp_to_next_level - self.experience_points}", True, (255, 255, 255))
+        xp_needed_text_rect = xp_needed_text.get_rect()
+        xp_needed_text_rect.midbottom = (xp_bar_x + xp_bar_width // 2, xp_bar_y - 20)  # Position above the XP bar
 
-        window.blit(level_text, level_text_rect)
+        window.blit(xp_needed_text, xp_needed_text_rect)

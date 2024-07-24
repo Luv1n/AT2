@@ -56,8 +56,9 @@ class Game:
                 if result == 'back':
                     self.state = 'character_select'
                 elif result == 'quit':
-                    pygame.quit()
-                    return
+                    if self.game_map.game_phase == 2:
+                        pygame.quit()
+                        return
                 else:
                     self.game_map.draw()
 
